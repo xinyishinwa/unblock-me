@@ -1,6 +1,15 @@
 import { BOARD_SIZE, Piece, POT_ID } from "@/lib/game/puzzle-engine";
+import type {
+  ChapterId,
+  MechanicId,
+  SpecialConfig,
+  StarThresholds,
+  ThemeId,
+  TutorialInfo,
+} from "@/lib/game/special-types";
+import { GOLDEN_TRAILS_LEVELS } from "./golden-trails";
 
-export type Difficulty = "Easy" | "Medium" | "Hard";
+export type Difficulty = "Easy" | "Medium" | "Hard" | "Expert";
 
 export interface LogDef {
   id: string;
@@ -20,6 +29,19 @@ export interface LevelConfig {
   logs: LogDef[];
   /** Optimal number of moves (verified by BFS in puzzle-validator). */
   minMoves: number;
+  /** Chapter this level belongs to (undefined = the original Amulung levels). */
+  chapter?: ChapterId;
+  /** Background environment (undefined = the classic countryside). */
+  theme?: ThemeId;
+  /** Special mechanic this level introduces. */
+  mechanic?: MechanicId;
+  /** Short label for the mechanic badge, e.g. "Bridge Switch". */
+  mechanicLabel?: string;
+  /** Special objects + mechanic configuration. Absent on Levels 1-5. */
+  special?: SpecialConfig;
+  tutorial?: TutorialInfo;
+  /** Move thresholds for 3 and 2 stars. Absent = derived from `minMoves`. */
+  stars?: StarThresholds;
 }
 
 const h = "horizontal" as const;
@@ -29,7 +51,7 @@ const v = "vertical" as const;
  * Five hand-picked levels. Every one is verified solvable (and `minMoves`
  * verified optimal) by `npm run validate-levels`.
  */
-export const LEVELS: LevelConfig[] = [
+export const CLASSIC_LEVELS: LevelConfig[] = [
   {
     id: 1,
     name: "The Village Trail",
@@ -112,6 +134,9 @@ export const LEVELS: LevelConfig[] = [
     minMoves: 24,
   },
 ];
+
+/** Every level, in play order: the original five followed by Golden Trails. */
+export const LEVELS: LevelConfig[] = [...CLASSIC_LEVELS, ...GOLDEN_TRAILS_LEVELS];
 
 export function getLevel(id: number): LevelConfig | undefined {
   return LEVELS.find((l) => l.id === id);

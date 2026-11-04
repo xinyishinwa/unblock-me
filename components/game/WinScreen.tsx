@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { ArrowRight, ListOrdered, RotateCcw, Trophy } from "lucide-react";
+import { ArrowRight, Coins, ListOrdered, RotateCcw, Trophy } from "lucide-react";
+import StarRating from "./StarRating";
 
 interface Props {
   levelName: string;
@@ -11,6 +12,13 @@ interface Props {
   minMoves: number;
   nextLevelId: number | null;
   onReplay: () => void;
+  /** Star rating earned this run (shown when provided). */
+  stars?: number;
+  /** Bonus coins for unused moves (move-limit levels). */
+  bonus?: number;
+  unusedMoves?: number;
+  /** Confetti palette override (level theme). */
+  confetti?: string[];
 }
 
 const CONFETTI = ["#ffd21f", "#ff6b6b", "#4ecb71", "#4dabf7", "#ff9f43", "#cc5de8"];
@@ -22,6 +30,10 @@ export default function WinScreen({
   minMoves,
   nextLevelId,
   onReplay,
+  stars,
+  bonus,
+  unusedMoves,
+  confetti = CONFETTI,
 }: Props) {
   const nextRef = useRef<HTMLAnchorElement>(null);
   useEffect(() => {
@@ -44,7 +56,7 @@ export default function WinScreen({
             className="absolute top-0 block h-3 w-2 animate-confetti rounded-sm"
             style={{
               left: `${(i * 97) % 100}%`,
-              background: CONFETTI[i % CONFETTI.length],
+              background: confetti[i % confetti.length],
               animationDelay: `${((i * 37) % 30) / 10}s`,
               animationDuration: `${2.6 + ((i * 13) % 20) / 10}s`,
             }}
@@ -60,6 +72,11 @@ export default function WinScreen({
           You Found the Pot of Gold!
         </h2>
         <p className="mt-1 font-semibold text-[#7a5430]">{levelName} cleared</p>
+        {stars !== undefined && (
+          <div className="mt-2 flex justify-center">
+            <StarRating value={stars} size={40} />
+          </div>
+        )}
 
         <div className="mt-5 grid grid-cols-2 gap-3">
           <div className="rounded-2xl bg-white/70 p-3">
@@ -74,6 +91,14 @@ export default function WinScreen({
             </p>
           </div>
         </div>
+        {bonus !== undefined && bonus > 0 && (
+          <p
+            className="mx-auto mt-3 flex w-fit items-center gap-2 rounded-full bg-purple-200 px-4 py-1 font-display text-lg font-bold text-purple-900"
+            data-testid="bonus"
+          >
+            <Coins size={20} aria-hidden="true" /> Bonus: +{bonus} gold for {unusedMoves} unused move{unusedMoves === 1 ? "" : "s"}!
+          </p>
+        )}
         {moves === minMoves && (
           <p className="mt-3 font-display text-lg font-bold text-green-700">Perfect solution!</p>
         )}

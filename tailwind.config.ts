@@ -44,6 +44,42 @@ const config: Config = {
           "0%, 100%": { transform: "translateX(0)" },
           "50%": { transform: "translateX(5px)" },
         },
+        shake: {
+          "0%, 100%": { transform: "translateX(0)" },
+          "20%": { transform: "translateX(-5px)" },
+          "40%": { transform: "translateX(5px)" },
+          "60%": { transform: "translateX(-3px)" },
+          "80%": { transform: "translateX(3px)" },
+        },
+        rise: {
+          "0%": { opacity: "0", transform: "translateY(12px) scale(0.95)" },
+          "100%": { opacity: "1", transform: "translateY(0) scale(1)" },
+        },
+        snow: {
+          "0%": { transform: "translateY(-6vh) translateX(0)", opacity: "0" },
+          "10%": { opacity: "0.9" },
+          "100%": { transform: "translateY(106vh) translateX(40px)", opacity: "0.7" },
+        },
+        rays: {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+        glow: {
+          "0%, 100%": { opacity: "0.55" },
+          "50%": { opacity: "1" },
+        },
+        melt: {
+          "0%": { opacity: "1", transform: "scale(1)", filter: "blur(0)" },
+          "100%": { opacity: "0", transform: "scale(1.06) translateY(6px)", filter: "blur(3px)" },
+        },
+        coin: {
+          "0%": { transform: "translateY(-12vh) rotate(0deg)", opacity: "1" },
+          "100%": { transform: "translateY(112vh) rotate(900deg)", opacity: "1" },
+        },
+        ripple: {
+          "0%, 100%": { transform: "translateX(0)" },
+          "50%": { transform: "translateX(6px)" },
+        },
       },
       animation: {
         drift: "drift 50s ease-in-out infinite alternate",
@@ -54,6 +90,14 @@ const config: Config = {
         confetti: "confetti 3.5s linear infinite",
         hint: "hint 1.2s ease-out infinite",
         nudge: "nudge 1s ease-in-out infinite",
+        shake: "shake 0.4s ease-in-out",
+        rise: "rise 0.35s ease-out both",
+        snow: "snow 9s linear infinite",
+        rays: "rays 24s linear infinite",
+        glow: "glow 2.2s ease-in-out infinite",
+        melt: "melt 1.1s ease-out forwards",
+        coin: "coin 4s linear infinite",
+        ripple: "ripple 4s ease-in-out infinite",
       },
     },
   },

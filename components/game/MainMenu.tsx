@@ -89,6 +89,7 @@ function HowToPlay({ onClose }: { onClose: () => void }) {
           <li>Drag a log with your mouse or finger. Or select it and use the arrow keys.</li>
           <li>Push the Pot of Gold out of the exit on the right to win.</li>
           <li>Fewer moves is better! Use Undo, Reset, or Hint if you get stuck.</li>
+          <li>Golden Trails (levels 6–10) add switches, keys, frozen logs and move limits. A short tutorial introduces each one.</li>
         </ul>
         <button type="button" className="btn-green mt-5 w-full" onClick={onClose}>
           Got it!

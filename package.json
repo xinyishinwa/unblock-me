@@ -6,7 +6,8 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "validate-levels": "tsx scripts/validate-levels.ts"
+    "validate-levels": "tsx scripts/validate-levels.ts",
+    "test": "tsx scripts/test-engine.ts"
   },
   "repository": {
     "type": "git",

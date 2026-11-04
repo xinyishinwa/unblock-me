@@ -2,68 +2,63 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { LevelConfig, levelToPieces } from "@/data/levels";
-import { Move, Piece, applyMove, axisPos, isSolved } from "./puzzle-engine";
-import { getHint } from "./puzzle-solver";
+import { createInitialState, isFailed } from "./puzzle-state";
+import {
+  createSession,
+  sessionHint,
+  sessionMove,
+  sessionReject,
+  sessionReset,
+  sessionUndo,
+} from "./game-session";
+import type { SpecialConfig } from "./special-types";
 
-interface GameState {
-  pieces: Piece[];
-  /** Previous board states, oldest first. One entry per completed move. */
-  history: Piece[][];
-  hint: Move | null;
-}
+const NO_SPECIAL: SpecialConfig = {};
 
-/** Game session state for one level: moves, undo, reset and hints. */
+/**
+ * Game session for one level (React wrapper over the pure transitions in
+ * `game-session`). The whole `PuzzleState` is snapshotted on every valid move,
+ * so Undo restores everything and Reset returns to the exact initial state.
+ */
 export function useGame(level: LevelConfig) {
-  const initial = useMemo(() => levelToPieces(level), [level]);
-  const [state, setState] = useState<GameState>({
-    pieces: initial,
-    history: [],
-    hint: null,
-  });
+  const special = level.special ?? NO_SPECIAL;
+  const initial = useMemo(
+    () => createInitialState(levelToPieces(level), special),
+    [level, special],
+  );
+  const [session, setSession] = useState(() => createSession(initial));
 
-  const solved = isSolved(state.pieces);
+  const move = useCallback(
+    (id: string, to: number) => setSession((s) => sessionMove(s, special, id, to)),
+    [special],
+  );
+  const reject = useCallback(
+    (id: string, dir: -1 | 1) => setSession((s) => sessionReject(s, special, id, dir)),
+    [special],
+  );
+  const undo = useCallback(() => setSession(sessionUndo), []);
+  const reset = useCallback(() => setSession((s) => sessionReset(s, initial)), [initial]);
+  const requestHint = useCallback(
+    () => setSession((s) => sessionHint(s, special)),
+    [special],
+  );
 
-  const move = useCallback((id: string, to: number) => {
-    setState((s) => {
-      if (isSolved(s.pieces)) return s;
-      const piece = s.pieces.find((p) => p.id === id);
-      if (!piece) return s;
-      const from = axisPos(piece);
-      if (to === from) return s;
-      const next = applyMove(s.pieces, { id, from, to });
-      if (!next) return s;
-      return { pieces: next, history: [...s.history, s.pieces], hint: null };
-    });
-  }, []);
-
-  const undo = useCallback(() => {
-    setState((s) => {
-      if (s.history.length === 0) return s;
-      return {
-        pieces: s.history[s.history.length - 1],
-        history: s.history.slice(0, -1),
-        hint: null,
-      };
-    });
-  }, []);
-
-  const reset = useCallback(() => {
-    setState({ pieces: initial, history: [], hint: null });
-  }, [initial]);
-
-  const requestHint = useCallback(() => {
-    setState((s) =>
-      isSolved(s.pieces) ? s : { ...s, hint: getHint(s.pieces) },
-    );
-  }, []);
-
+  const { state } = session;
   return {
+    state,
     pieces: state.pieces,
-    moves: state.history.length,
-    canUndo: state.history.length > 0 && !solved,
-    hint: state.hint,
-    solved,
+    moves: session.history.length,
+    movesLeft: state.movesLeft,
+    canUndo: session.history.length > 0 && !state.completed,
+    hint: session.hint,
+    hintMissing: session.hintMissing,
+    solved: state.completed,
+    failed: isFailed(state),
+    events: session.events,
+    tick: session.tick,
+    rejected: session.rejected,
     move,
+    reject,
     undo,
     reset,
     requestHint,
